@@ -65,7 +65,7 @@ function RequirePaymentModal({info1, info2, info3, page})  {
             }
     
             const handler = window.PaystackPop.setup({
-                key: "pk_test_d9b8c4ff167bb22afa168ab92ab2f50bee0706bc",
+                key: "pk_live_799cee750ccc13e4fd2fe4daf8a91bae46a93092",
                 email: billingEmail,
                 amount: usageAmount * 100,
                 currency: 'GHS',

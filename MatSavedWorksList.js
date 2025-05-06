@@ -900,12 +900,12 @@ function MatSavedWorkList({ route }) {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Image style={{
+                {/* <Image style={{
                     width: deviceWidth < 500 ? 70 : 100, 
                     height: deviceWidth < 500 ? 70 : 100,
                 }}
                 source={require("./assets/images/icon.png")}
-                />
+                /> */}
                 <Pressable style={styles.headerInfo}
                     onPress={() => {
                     const response = window.confirm('Navigate to main screen');
@@ -918,12 +918,12 @@ function MatSavedWorkList({ route }) {
                     {/* <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Fabrication</Text> */}
                     {/* <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Apps</Text> */}
                     <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Materials</Text>
-                    <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Worker</Text>
+                    <Text style={[styles.txtHeaderInfo2, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Worker</Text>
                 </Pressable>
                 <View style={styles.infoSW}>
                     <Text style={[
                         styles.txtSheetWorker,
-                        {fontSize: deviceWidth <= 500 ? 15 : 20}
+                        {fontSize: deviceWidth <= 500 ? 15 : 18}
                     ]}>Material List</Text>
                     <View style={{width: deviceWidth < 800 ? 0 : 100, height:0,}}></View>
                 </View>
@@ -2653,10 +2653,17 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
+        height: 65,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#383961',
         marginBottom: 10,
+    },
+    headerInfo: {
+        borderRightWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        paddingRight: 7,
+        paddingLeft: 15,
     },
     txtHeaderInfo: {
         color: '#fff',
@@ -2664,6 +2671,12 @@ const styles = StyleSheet.create({
         fontFamily: 'Underdog',
         textAlign: 'center',
         marginBottom: 5,
+    },
+    txtHeaderInfo2: {
+        color: '#fff',
+        letterSpacing: 3,
+        fontFamily: 'Underdog',
+        textAlign: 'center',
     },
     infoSW: {
         flex: 1,

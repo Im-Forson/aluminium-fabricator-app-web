@@ -30,6 +30,13 @@ export default function SavingCalculating({ isVisible, text }) {
                         fontSize: 16,
                         fontStyle: 'italic',
                     }}>{text}</Text>
+                    <Text style={{
+                        color: '#ff5',
+                        letterSpacing: 3,
+                        fontSize: 13,
+                        fontStyle: 'italic',
+                        marginTop: 10,
+                    }}>just a moment</Text>
                 </View>
             </View>
             </Modal>

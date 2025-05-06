@@ -2,7 +2,6 @@ import { View, Text, Pressable, StyleSheet, Modal, Dimensions, ToastAndroid } fr
 import { useState, useContext, } from 'react';
 
 import { AlufappContext } from './alufapp-context'; 
-import AlufappToast from './AlufappToast';
 
 export default function PreviewDrawing({ isVisible, onPress, type, direction, msWidth, msHeight, divisions, divisionsIn, doneoPress, isFinal }) { 
     const alufappContext = useContext(AlufappContext);

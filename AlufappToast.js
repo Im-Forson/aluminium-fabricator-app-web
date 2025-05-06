@@ -3,7 +3,7 @@ import {useContext, useState, useEffect} from "react";
 
 import { AlufappContext } from "./alufapp-context";
 
-function AlufappToast({ toastVisible, info })  {
+function AlufappToast({ toastVisible, info, info2 })  {
     const deviceDimension = Dimensions.get("window");
     const deviceWidth = deviceDimension.width;
     const alufappContext = useContext(AlufappContext);
@@ -18,7 +18,7 @@ function AlufappToast({ toastVisible, info })  {
         if(isToast) {
             setTimeout(() => {
                 alufappContext.closeToast();
-            }, 3000);
+            }, 2000);
         }
     }, [isToast]);
     
@@ -28,6 +28,7 @@ function AlufappToast({ toastVisible, info })  {
                 <View style={styles.alertModal}>
                     <View style={[styles.alertInfoCon, ]}>
                         <Text style={styles.txtInfo}>{info}</Text>                            
+                        <Text style={styles.txtInfo}>{info2}</Text>                            
                     </View>
                 </View>
             </Modal>
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     
     txtInfo: {
         letterSpacing: 4,
-        fontSize: 16,
+        fontSize: 14,
         color: '#fff',
         fontWeight: '500'
     },

@@ -1,10 +1,8 @@
 import { StyleSheet, Text, View, Pressable, Image, Dimensions, ScrollView, Linking, Platform } from 'react-native';
 import { useNavigation } from "@react-navigation/native"
-import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
 import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-// import { ScrollView } from 'react-native-gesture-handler';
 
 function MainPage() {
     const navigation = useNavigation();
@@ -18,8 +16,10 @@ function MainPage() {
     const [isWorkSheetHoverIn, setWorkSheetHoverIn] = useState(false)
     const [isWorkWinDorHoverIn, setWorkWinDorHoverIn] = useState(false)
     const [isDownloadApps, setDownloadApps] = useState(false);
+    const [isSheetAndroid, setSheetAndroid] = useState(false);
     const [isSheetIos, setSheetIos] = useState(false);
     const [isMaterialsIos, setMaterialsIos] = useState(false)
+    const [isMaterialsAndroid, setMaterialsAndroid] = useState(false)
     const [] = useState(false)
     const [] = useState(false)
 
@@ -29,13 +29,18 @@ function MainPage() {
           setSheetIos(false);
         }, 2000);
       }
+      if (isSheetAndroid) {
+        setTimeout(() => {
+          setSheetAndroid(false);
+        }, 2000);
+      }
 
       if (isMaterialsIos) {
         setTimeout(() => {
           setMaterialsIos(false);
         }, 4000);
       }
-    }, [isSheetIos, isMaterialsIos]);
+    }, [isSheetIos, isMaterialsIos, isSheetAndroid]);
 
     const downloadSWAndroid = () => {
       Linking.openURL('https://github.com/Im-Forson/aluminium-fabrication-apps/releases/download/v1.0.0/application-e5fe8b51-f9b2-4e04-a7fa-54fd4468b249.1.apk')
@@ -55,16 +60,17 @@ function MainPage() {
       // Linking.openURL('https://github.com/Im-Forson/aluminium-fabrication-apps/releases/download/v1.0.0/application-e5fe8b51-f9b2-4e04-a7fa-54fd4468b249.1.apk')
     }
 //https://drive.google.com/file/d/1A5vrdgTbo3lzTZdYydmZIqR11XpdaJ4y/view?usp=sharing
-    const handleDownload = () => {
-      if (Platform.OS === 'web') {
-        const a = document.createElement('a');
-        a.href = 'https://drive.google.com/uc?export=download&id=1A5vrdgTbo3lzTZdYydmZIqR11XpdaJ4y';
-        a.download = 'alufapp-apk';
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
+    const handleSheetAndroidDownload = () => {
+      setSheetAndroid(true)
+      // if (Platform.OS === 'web') {
+      //   const a = document.createElement('a');
+      //   a.href = 'https://drive.google.com/uc?export=download&id=1A5vrdgTbo3lzTZdYydmZIqR11XpdaJ4y';
+      //   a.download = 'alufapp-apk';
+      //   a.style.display = 'none';
+      //   document.body.appendChild(a);
+      //   a.click();
+      //   document.body.removeChild(a);
+      // }
     }
 
     const [fontsLoaded] = useFonts({
@@ -80,13 +86,19 @@ function MainPage() {
     <View style={styles.container}>
       <ScrollView scrollEnabled={true} style={{height: 1,}}>
         <View style={styles.header}>
-          <Image style={{width: 100, height: 100}}
+          {/* <Image style={{width: 100, height: 100}}
           source={require("./assets/images/icon.png")}
-          />
+          /> */}
+          <View style={styles.appLogo}>
+              <View style={styles.alu}></View>
+              <View style={styles.fab}></View>
+              <View style={styles.ap}></View>
+          </View>
           <View style={styles.headerInfo}>
+            {/* <Text style={styles.txtHeaderInfo}>Alufapp</Text> */}
             <Text style={styles.txtHeaderInfo}>Aluminium</Text>
-            <Text style={styles.txtHeaderInfo}>Fabrication</Text>
-            <Text style={styles.txtHeaderInfo}>Apps</Text>
+            <Text style={styles.txtHeaderInfo}>Fab Apps</Text>
+            {/* <Text style={styles.txtHeaderInfo}>Apps</Text> */}
           </View>
         </View>
         <View>
@@ -162,34 +174,7 @@ function MainPage() {
           </Pressable>
           <View style={{display: isDownloadApps ? 'flex' : 'none', alignItems: 'center'}}>
             <View style={styles.apps}>
-              <Pressable style={({pressed}) => [styles.app, pressed && {backgroundColor: 'black'}]}
-                onPress={handleDownload}
-              >
-                <Text style={styles.appName}>Sheet Worker</Text>
-                <View style={styles.logo}>
-                  <Ionicons name='logo-android' size={20} color='#fff'/>
-                  <Text style={[styles.appType, {color: '#A4C639'}]}>android</Text>
-                </View>
-                <View style={styles.downloadApp}>
-                  <Ionicons name='download-outline' size={20} color='#fff'/>
-                </View>
-              </Pressable>
-              <Pressable style={({pressed}) => [styles.app, pressed && {backgroundColor: 'black'}]}
-                onPress={downloadSWIos}
-              >
-                <Text style={styles.appName}>Sheet Worker</Text>
-                <View style={styles.logo}>
-                  <Ionicons name='logo-apple' size={20} color='#fff'/>
-                  <Text style={[styles.appType, {color: '#A4C639'}]}>ios</Text>
-                </View>
-                <View style={styles.downloadApp}>
-                  <Ionicons name='download-outline' size={20} color='#fff'/>
-                </View>
-              </Pressable>
-              <View style={[styles.unvalaible, {display: isSheetIos ? 'flex' : 'none',}]}>
-                <Text style={styles.txtUnavailable}>ios version not available</Text>
-              </View>
-              <Pressable style={({pressed}) => [styles.app, pressed && {backgroundColor: 'black'}]}
+            <Pressable style={({pressed}) => [styles.app, pressed && {backgroundColor: 'black'}]}
                onPress={downloadMWAndroid}
               >
                 <Text style={styles.appName}>Material Worker</Text>
@@ -202,19 +187,49 @@ function MainPage() {
                 </View>
               </Pressable>
               <Pressable style={({pressed}) => [styles.app, pressed && {backgroundColor: 'black'}]}
-                onPress={downloadMaterialsIos}
+                // onPress={downloadMaterialsIos}
               >
-                <Text style={styles.appName}>Material Worker</Text>
+                <Text style={styles.appNameUnav}>Material Worker</Text>
                 <View style={styles.logo}>
-                  <Ionicons name='logo-apple' size={20} color='#fff'/>
-                  <Text style={[styles.appType, {color: '#A4C639'}]}>ios</Text>
+                  <Ionicons name='logo-apple' size={20} color='grey'/>
+                  <Text style={[styles.appType, {color: 'grey'}]}>ios</Text>
                 </View>
                 <View style={styles.downloadApp}>
-                  <Ionicons name='download-outline' size={20} color='#fff'/>
+                  <Ionicons name='download-outline' size={20} color='grey'/>
                 </View>
               </Pressable>
               <View style={[styles.unvalaible, {display: isMaterialsIos ? 'flex' : 'none',}]}>
-                <Text style={styles.txtUnavailable}>ios version not available</Text>
+                <Text style={styles.txtUnavailable}>version not yet available</Text>
+              </View>
+              <Pressable style={({pressed}) => [styles.app, pressed && {backgroundColor: 'black'}]}
+                // onPress={handleSheetAndroidDownload}
+              >
+                <Text style={styles.appNameUnav}>Sheet Worker</Text>
+                <View style={styles.logo}>
+                  <Ionicons name='logo-android' size={20} color='grey'/>
+                  <Text style={[styles.appType, {color: 'grey'}]}>android</Text>
+                </View>
+                <View style={styles.downloadApp}>
+                  <Ionicons name='download-outline' size={20} color='grey'/>
+                </View>
+              </Pressable>
+              <View style={[styles.unvalaible, {display: isSheetAndroid ? 'flex' : 'none',}]}>
+                <Text style={styles.txtUnavailable}>version not yet available</Text>
+              </View>
+              <Pressable style={({pressed}) => [styles.app, pressed && {backgroundColor: 'black'}]}
+                // onPress={downloadSWIos}
+              >
+                <Text style={styles.appNameUnav}>Sheet Worker</Text>
+                <View style={styles.logo}>
+                  <Ionicons name='logo-apple' size={20} color='grey'/>
+                  <Text style={[styles.appType, {color: 'grey'}]}>ios</Text>
+                </View>
+                <View style={styles.downloadApp}>
+                  <Ionicons name='download-outline' size={20} color='grey'/>
+                </View>
+              </Pressable>
+              <View style={[styles.unvalaible, {display: isSheetIos ? 'flex' : 'none',}]}>
+                <Text style={styles.txtUnavailable}>version not yet available</Text>
               </View>
               <Pressable style={({pressed}) => [styles.downloadBtn, pressed && {backgroundColor: 'grey'}]}
                onPress={() => setDownloadApps(false)}
@@ -243,10 +258,46 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    position: 'static'
+    position: 'static',
+    marginTop: 15,
+  },
+  appLogo: {
+    flexDirection: 'row',
+    marginLeft: 10,
+    marginRight: 15,
+    padding: 8,
+    borderRadius: 3,
+    backgroundColor: 'rgb(97, 60, 84)',
+    // borderWidth: 1,
+    // borderColor: 'grey'
+  },
+  alu: {
+    width: 10,
+    height: 20,
+    borderLeftWidth: 2,
+    borderTopWidth: 2,
+    borderRightWidth: 2,
+    borderColor: '#fff',
+  },
+  fab: {
+    width: 10,
+    height: 10,
+    borderTopWidth: 2,
+    borderBottomWidth: 2,
+    borderColor: '#fff',
+    // marginRight: 5,
+  },
+  ap: {
+    width: 10,
+    height: 12,
+    borderLeftWidth: 2,
+    borderTopWidth: 2,
+    borderRightWidth: 2,
+    marginTop: 8,
+    borderColor: '#fff',
   },
   headerInfo: {
-
+    // flexDirection: 'row'
   },
   txtHeaderInfo: {
     color: '#fff',
@@ -393,11 +444,25 @@ const styles = StyleSheet.create({
     letterSpacing: 3,
     color: '#fff',
   },
+  appNameUnav: {
+    width: 130,
+    fontSize: 12,
+    letterSpacing: 3,
+    color: 'grey',
+  },
   appType: {
     letterSpacing: 2,
     fontSize: 10,
     fontStyle: 'italic',
     color: '#fff',
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  appTypeUnav: {
+    letterSpacing: 2,
+    fontSize: 10,
+    fontStyle: 'italic',
+    color: 'grey',
     marginLeft: 20,
     marginRight: 20,
   },

@@ -3,9 +3,7 @@ import { useState, useContext, useEffect, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { onValue, ref } from "firebase/database";
 
-import { database } from "./firebaseConfig";
 import { AlufappContext } from "./alufapp-context";
 import AlufappToast from "./AlufappToast";
 import RequirePaymentModal from "./RequirePaymentModal";
@@ -90,12 +88,22 @@ function SheetCalcHomePage() {
             if (workKeys.length > 0) {
                 const works = [];
                 for (let i = workKeys.length-1; i >= 0; i--) {
-                    if (workKeys[i] !== '@gwlang' && workKeys[i] !== '@gwusage') {
+                    let workKey = workKeys[i], prefix = '';
+
+                    for (let j = 0; j <=3; j++) {
+                        prefix += workKey[j];
+                    }
+
+                    if (prefix == '@gw-') {
                         const work = await AsyncStorage.getItem(workKeys[i]);
                         works.push(JSON.parse(work));
                     }
                 }
-                alufappContext.setWorks(works);
+
+                if (works.length > 0) {
+                    alufappContext.setWorks(works);
+                }
+                
                 // window.alert('Works loaded');
                 // ToastAndroid.show("Saved works loaded ", 3000);
             }
@@ -120,7 +128,7 @@ function SheetCalcHomePage() {
 
     const fetchDevin = async () => {
         try {
-            const res = await fetch('http://alufapp-backend.vercel.app/api/datalist', {
+            const res = await fetch('https://alufapp-backend.onrender.com/dataList', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -129,20 +137,10 @@ function SheetCalcHomePage() {
 
             const data = await res.json();
             setDevin(data.devin);
-            console.log(data)
-        } catch (error) {
-            console.log(error)
-        }
-    }
 
-    const fetchdata  = async () => {
-        fetch('https://your-vercel-domain.vercel.app/api/datalist', {
-            method: 'POST', // or 'GET'
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ key: 'value' }),
-        })
+        } catch (error) {
+            // console.log(error)
+        }
     }
 
     useEffect(() => { 
@@ -150,7 +148,6 @@ function SheetCalcHomePage() {
         loadWorksData();
         loadUsage();
         fetchDevin();
-        fetchdata();
     }, []);
 
     // Set all same quantity to null when on this page
@@ -189,6 +186,7 @@ function SheetCalcHomePage() {
         const quantityIsValid = !isNaN(windowsQuantity);
 
         if (enteredTitle === devin.cred_add) {
+            setWorkTitle('');
             navigation.navigate('Developer', {page: 'mat-list'});
             return;
         }
@@ -373,12 +371,12 @@ function SheetCalcHomePage() {
              page='sheet-calc-home'
             />
             <View style={styles.header}>
-                <Image style={{
+                {/* <Image style={{
                     width: deviceWidth < 500 ? 70 : 100, 
                     height: deviceWidth < 500 ? 70 : 100,
                 }}
                 source={require("./assets/images/icon.png")}
-                />
+                /> */}
                 <Pressable style={styles.headerInfo}
                  onPress={() => {navigation.navigate('Main')}}
                 >
@@ -386,7 +384,7 @@ function SheetCalcHomePage() {
                     <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Fabrication</Text>
                     <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Apps</Text> */}
                     <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Sheet</Text>
-                    <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Worker</Text>
+                    <Text style={[styles.txtHeaderInfo2, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Worker</Text>
                 </Pressable>
                 <View style={styles.infoSW}>
                     {/* <View style={{display: deviceWidth < 500 ? 'flex' : 'none'}}>
@@ -938,10 +936,17 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff'
     },
     header: {
+        height: 65,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#383961',
         marginBottom: 10,
+    },
+    headerInfo: {
+        borderRightWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        paddingRight: 7,
+        paddingLeft: 15,
     },
     txtHeaderInfo: {
         color: '#fff',
@@ -949,6 +954,12 @@ const styles = StyleSheet.create({
         fontFamily: 'Underdog',
         textAlign: 'center',
         marginBottom: 5,
+    },
+    txtHeaderInfo2: {
+        color: '#fff',
+        letterSpacing: 3,
+        fontFamily: 'Underdog',
+        textAlign: 'center',
     },
     infoSW: {
         flex: 1,

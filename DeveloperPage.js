@@ -1,9 +1,7 @@
 import { View, Text, TextInput, StyleSheet, Pressable, Image, ScrollView } from 'react-native';
 import { useEffect, useState, useContext } from 'react';
-import { onValue, ref } from 'firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { database } from './firebaseConfig';
 import { AlufappContext } from './alufapp-context';
 
 function DeveloperPage({ route }) {
@@ -18,7 +16,7 @@ function DeveloperPage({ route }) {
 
     const fetchDevin = async () => {
         try {
-            const res = await fetch('http://localhost:3001/datalist', {
+            const res = await fetch('https://alufapp-backend.onrender.com/dataList', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

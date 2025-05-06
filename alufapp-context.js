@@ -151,9 +151,13 @@ export const AlufappContext = createContext({
     closeAlert: () => {},
     showAlert: () => {},
 
-    isLoading: false,
-    closeLoading: () => {},
-    showLoading: () => {},
+    isSheetCalculating: false,
+    closeSheetCalculating: () => {},
+    showSheetCalculating: () => {},
+
+    isMatCalculating: false,
+    closeMatCalculating: () => {},
+    showMatCalculating: () => {},
 
     isLaunch: true,
     closeLaunch: () => {},
@@ -472,6 +476,28 @@ function loadingReducer(state, action) {
     }
 }
 
+function sheetCalculatingReducer(state, action) {
+    switch (action.type) {
+        case "SHOW":
+            return state = action.payload;
+        case "CLOSE":
+            return state = action.payload;
+        default:
+            return;
+    }
+}
+
+function matCalculatingReducer(state, action) {
+    switch (action.type) {
+        case "SHOW":
+            return state = action.payload;
+        case "CLOSE":
+            return state = action.payload;
+        default:
+            return;
+    }
+}
+
 function toastReducer(state, action) {
     switch (action.type) {
         case "SHOW":
@@ -659,6 +685,8 @@ function AlufappContextProvider({ children }) {
     const [developerState, developerDispatch] = useReducer(developerReducer, false);
     const [removeAdsState, removeAdsDispatch] = useReducer(removeAdsReducer, false);
     const [loadingState, loadingDispatch] = useReducer(loadingReducer, false);
+    const [sheetCalculatngState, sheetCalculatingDispatch] = useReducer(sheetCalculatingReducer, false);
+    const [matCalculatingState, matCalculatingDispatch] = useReducer(matCalculatingReducer, false);
     const [toastState, toastDispatch] = useReducer(toastReducer, false);
     const [whichToastState, whichToastDispatch] = useReducer(whichToastReducer, false);
     const [sheetCalcLimitedState, sheetCalcLimitedDispatch] = useReducer(sheetCalcLimitedReducer, true);
@@ -806,6 +834,20 @@ function AlufappContextProvider({ children }) {
 
     function closeLoading() {
         loadingDispatch({ type: "CLOSE", payload: false });
+    }
+
+    function showSheetCalculating() {
+        sheetCalculatingDispatch({ type: "SHOW", payload: true });
+    }
+    function closeSheetCalculating() {
+        sheetCalculatingDispatch({ type: "CLOSE", payload: false });
+    }
+
+    function showMatCalculating() {
+        matCalculatingDispatch({ type: "SHOW", payload: true });
+    }
+    function closeMatCalculating() {
+        matCalculatingDispatch({ type: "CLOSE", payload: false });
     }
 
     function showToast() {
@@ -981,6 +1023,12 @@ function AlufappContextProvider({ children }) {
         isToast: toastState,
         showToast: showToast,
         closeToast: closeToast,
+        isSheetCalculating: sheetCalculatngState,
+        showSheetCalculating: showSheetCalculating,
+        closeSheetCalculating: closeSheetCalculating,
+        isMatCalculating: matCalculatingState,
+        showMatCalculating: showMatCalculating,
+        closeMatCalculating: closeMatCalculating,
         isWhichToast: whichToastState,
         setWhichToast: setWhichToast,
         unit: unitState,

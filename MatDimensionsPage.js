@@ -47,7 +47,7 @@ function MatDimensionsPage({ route }) {
     const [totalArea, setTotalArea] = useState(0);
     const [isEdit, setEdit] = useState(false);
     const [isRemove, setRemove] = useState(false);
-   
+    const [EditMsQty, setEditMsQty] = useState();
     
     const [isUsageAlert, setUsageAlert] = useState(false);
     const [isReturnAlert, setReturnAlert] = useState(false);
@@ -61,7 +61,7 @@ function MatDimensionsPage({ route }) {
     const [bayValue, setBayValue] = useState(2);
     const [widthValue, setWidthValue] = useState('');
     const [heightValue, setHeightValue] = useState('');
-    const [qtyValue, setQtyhValue] = useState('');
+    const [qtyValue, setQtyValue] = useState('');
     const [] = useState(false);
 
     const [divWidthVal, setDivWidthVal] = useState(1);
@@ -1021,8 +1021,31 @@ function MatDimensionsPage({ route }) {
         let parsedQty = parseInt(trimmedQty);
         
         if (isLimited && (totalPieces >= windowsLimit || parsedQty > windowsLimit)) {
-            alufappContext.setOfflineModalVisible(true);
-            return;
+            if (isEdit) {
+                let newMsQty = totalPieces - EditMsQty + parsedQty;
+                if (newMsQty > windowsLimit) {
+                    alufappContext.setOfflineModalVisible(true);
+                    return;
+                }
+            }
+            else {
+                alufappContext.setOfflineModalVisible(true);
+                return;
+            }
+        }
+
+        if (isLimited && (totalPieces >= windowsLimit || parsedQty > windowsLimit)) {
+            if (isEdit) {
+                let newMsQty = totalPieces - EditMsQty + parsedQty;
+                if (newMsQty > windowsLimit) {
+                    alufappContext.setOfflineModalVisible(true);
+                    return;
+                }
+            }
+            else {
+                alufappContext.setOfflineModalVisible(true);
+                return;
+            }
         }
 
         const widthEmpty = trimmedWidth.length === 0;
@@ -1754,7 +1777,7 @@ function MatDimensionsPage({ route }) {
 
         setWidthValue('');
         setHeightValue('');
-        setQtyhValue('');
+        setQtyValue('');
         setBayValue(2);
         // ToastAndroid.show('Measurement added', 3000);
     }
@@ -1796,8 +1819,9 @@ function MatDimensionsPage({ route }) {
 
             setWidthValue(width.toString());
             setHeightValue(height.toString());
-            setQtyhValue(qty.toString());
+            setQtyValue(qty.toString());
             setBayValue(bay.toString());
+            setEditMsQty(qty);
         }
 
         else if (workType === 'Sliding-division') {
@@ -1811,10 +1835,11 @@ function MatDimensionsPage({ route }) {
 
             setWidthValue(width.toString());
             setHeightValue(height.toString());
-            setQtyhValue(qty.toString());
+            setQtyValue(qty.toString());
             setBayValue(bay.toString());
             setDivWidthVal(widthDiv);
             setDivHeightVal(heightDiv);
+            setEditMsQty(qty);
         }
 
         else {
@@ -1825,7 +1850,8 @@ function MatDimensionsPage({ route }) {
 
             setWidthValue(width.toString());
             setHeightValue(height.toString());
-            setQtyhValue(qty.toString());
+            setQtyValue(qty.toString());
+            setEditMsQty(qty);
         }
 
         setEdit(true);
@@ -1889,12 +1915,12 @@ function MatDimensionsPage({ route }) {
              }}
             />
             <View style={styles.header}>
-                <Image style={{
+                {/* <Image style={{
                     width: deviceWidth < 500 ? 70 : 100, 
                     height: deviceWidth < 500 ? 70 : 100,
                 }}
                 source={require("./assets/images/icon.png")}
-                />
+                /> */}
                 <Pressable style={styles.headerInfo}
                     onPress={() => {
                     const response = window.confirm('Navigate to main screen');
@@ -1907,12 +1933,12 @@ function MatDimensionsPage({ route }) {
                     {/* <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Fabrication</Text> */}
                     {/* <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Apps</Text> */}
                     <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Materials</Text>
-                    <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Worker</Text>
+                    <Text style={[styles.txtHeaderInfo2, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Worker</Text>
                 </Pressable>
                 <View style={styles.infoSW}>
                     <Text style={[
                         styles.txtSheetWorker,
-                        {fontSize: deviceWidth <= 500 ? 15 : 20}
+                        {fontSize: deviceWidth <= 500 ? 15 : 18}
                     ]}>Dimensions</Text>
                     <View style={{width: deviceWidth < 800 ? 0 : 200, height:0,}}></View>
                 </View>
@@ -1979,7 +2005,7 @@ function MatDimensionsPage({ route }) {
                                 placeholder="qty: 1"
                                 keyboardType="numeric"
                                 value={qtyValue}
-                                onChangeText={setQtyhValue}
+                                onChangeText={setQtyValue}
                                 />
                             </View>                                             
                         </View>
@@ -2790,6 +2816,9 @@ function MatDimensionsPage({ route }) {
                                                 setMsIndex(null);
                                                 setEdit(false);
                                                 setRemove(false);
+                                                setWidthValue('');
+                                                setHeightValue('');
+                                                setQtyValue('');
                                             }}
                                             >
                                                 <Ionicons name="remove-outline" size={15} color='maroon'/>
@@ -2840,10 +2869,17 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(236, 235, 228, 0.5)',
     },
     header: {
+        height: 65,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#383961',
         marginBottom: 1,
+    },
+    headerInfo: {
+        borderRightWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        paddingRight: 7,
+        paddingLeft: 15,
     },
     txtHeaderInfo: {
         color: '#fff',
@@ -2851,6 +2887,12 @@ const styles = StyleSheet.create({
         fontFamily: 'Underdog',
         textAlign: 'center',
         marginBottom: 5,
+    },
+    txtHeaderInfo2: {
+        color: '#fff',
+        letterSpacing: 3,
+        fontFamily: 'Underdog',
+        textAlign: 'center',
     },
     infoSW: {
         flex: 1,

@@ -21,9 +21,8 @@ export default function MaterialsOptionsPage({ route }) {
     const alufappContext = useContext(AlufappContext);
     const isToast = alufappContext.isToast;
     const isWhichToast = alufappContext.isWhichToast;
-
-    const [isMatOptLoading, setMatOptLoading] = useState(false);
-
+    const isCalculating = alufappContext.isMatCalculating;
+    
     const [isWhite, setWhite] = useState(true);
     const [isGrey, setGrey] = useState(false);
     const [isBlack, setBlack] = useState(false);
@@ -134,7 +133,7 @@ export default function MaterialsOptionsPage({ route }) {
 
     const fetchProfileResults = async (dims, profileLength) => {
         try {
-            const res = await fetch('http://localhost:3001/profile', {
+            const res = await fetch('https://alufapp-backend.onrender.com/profile', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -145,6 +144,7 @@ export default function MaterialsOptionsPage({ route }) {
             const data = await res.json();
             return data;
         } catch (error) {
+            alufappContext.closeMatCalculating();
             alufappContext.setWhichToast('mat-fetch-results');
             alufappContext.showToast();
         }
@@ -154,7 +154,7 @@ export default function MaterialsOptionsPage({ route }) {
 
     const fetchSheetResults = async (dim, size) => {
         try {
-            const res = await fetch('http://localhost:3001/sheet', {
+            const res = await fetch('https://alufapp-backend.onrender.com/sheet', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -165,6 +165,7 @@ export default function MaterialsOptionsPage({ route }) {
               const data = await res.json();
               return data;
         } catch (error) {
+            alufappContext.closeMatCalculating();
             alufappContext.setWhichToast('mat-fetch-results');
             alufappContext.showToast();
         }
@@ -1172,18 +1173,18 @@ export default function MaterialsOptionsPage({ route }) {
         }
     }
 
+    // -------------------------------------------------------------------------------------------
     return (
         <View style={styles.container}>
-
-            <SavingCalculating isVisible={isMatOptLoading} text={'Calculating...'}/>
-            <AlufappToast toastVisible={isToast && isWhichToast == 'mat-fetch-results'} info='Results fetch failed! Check internet'/>
+            <SavingCalculating isVisible={isCalculating} text={'Calculating...'}/>
+            <AlufappToast toastVisible={isToast && isWhichToast == 'mat-fetch-results'} info='Results fetch failed!' info2='Check your internet'/>
             <View style={styles.header}>
-                <Image style={{
+                {/* <Image style={{
                     width: deviceWidth < 500 ? 70 : 100, 
                     height: deviceWidth < 500 ? 70 : 100,
                 }}
                 source={require("./assets/images/icon.png")}
-                />
+                /> */}
                 <Pressable style={styles.headerInfo}
                     onPress={() => {
                     const response = window.confirm('Navigate to main screen');
@@ -1196,12 +1197,12 @@ export default function MaterialsOptionsPage({ route }) {
                     {/* <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Fabrication</Text> */}
                     {/* <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Apps</Text> */}
                     <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Materials</Text>
-                    <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Worker</Text>
+                    <Text style={[styles.txtHeaderInfo2, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Worker</Text>
                 </Pressable>
                 <View style={styles.infoSW}>
                     <Text style={[
                         styles.txtSheetWorker,
-                        {fontSize: deviceWidth <= 500 ? 15 : 20}
+                        {fontSize: deviceWidth <= 500 ? 15 : 18}
                     ]}>Materials Options</Text>
                     <View style={{width: deviceWidth < 800 ? 0 : 100, height:0,}}></View>
                 </View>
@@ -1210,7 +1211,7 @@ export default function MaterialsOptionsPage({ route }) {
             <ScrollView style={{
                 height: 1,
                 display: workType === 'Sliding' || workType === 'Sliding-division' ? 'flex' : 'none',
-            }}>
+             }}>
                 {/* SKIT-60 */}
                 <View style={{display: profileType === 'Skit-60' ? 'flex' : 'none', alignItems: 'center', marginBottom: 30}}>
                     <View style={[
@@ -2099,12 +2100,8 @@ export default function MaterialsOptionsPage({ route }) {
                         pressed && {opacity: 0.5}
                     ]}
                     onPress={() => {
-                        setMatOptLoading(true);
-                        
-                        setTimeout(() => {
-                            calculateHandler();
-                            setMatOptLoading(false); 
-                        }, 2000);
+                        alufappContext.showMatCalculating();
+                        calculateHandler();
                     }}
                     >
                         <Text style={styles.txtProceed}>Calculate</Text>
@@ -2116,7 +2113,7 @@ export default function MaterialsOptionsPage({ route }) {
             <ScrollView style={{
                 height: 1,
                 display: workType === 'Projected' || workType === 'Casement' ? 'flex' : 'none',
-            }}>
+             }}>
                 <View style={{alignItems: 'center', marginBottom: 30}}>
                     <View style={[
                      styles.workInputs, 
@@ -2400,12 +2397,8 @@ export default function MaterialsOptionsPage({ route }) {
                         pressed && {opacity: 0.5}
                     ]}
                     onPress={() => {
-                        setMatOptLoading(true);
-                        
-                        setTimeout(() => {
-                            calculateHandler();
-                            setMatOptLoading(false); 
-                        }, 2000);
+                        alufappContext.showMatCalculating();
+                        calculateHandler();
                     }}
                     >
                         <Text style={styles.txtProceed}>Calculate</Text>
@@ -2730,12 +2723,8 @@ export default function MaterialsOptionsPage({ route }) {
                         pressed && {opacity: 0.5}
                     ]}
                     onPress={() => {
-                        setMatOptLoading(true);
-                        
-                        setTimeout(() => {
-                            calculateHandler();
-                            setMatOptLoading(false); 
-                        }, 2000);
+                        alufappContext.showMatCalculating();
+                        calculateHandler();
                     }}
                     >
                         <Text style={styles.txtProceed}>Calculate</Text>
@@ -3002,12 +2991,8 @@ export default function MaterialsOptionsPage({ route }) {
                         pressed && {opacity: 0.5}
                     ]}
                     onPress={() => {
-                        setMatOptLoading(true);
-                        
-                        setTimeout(() => {
-                            calculateHandler();
-                            setMatOptLoading(false); 
-                        }, 2000);
+                        alufappContext.showMatCalculating();
+                        calculateHandler();
                     }}
                     >
                         <Text style={styles.txtProceed}>Calculate</Text>
@@ -3303,12 +3288,8 @@ export default function MaterialsOptionsPage({ route }) {
                         pressed && {opacity: 0.5}
                     ]}
                         onPress={() => {
-                            setMatOptLoading(true);
-                            
-                            setTimeout(() => {
-                                calculateHandler();
-                                setMatOptLoading(false); 
-                            }, 2000);
+                            alufappContext.showMatCalculating();
+                            calculateHandler();
                         }}
                     >
                         <Text style={styles.txtProceed}>Calculate</Text>
@@ -3327,10 +3308,17 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
+        height: 65,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#383961',
         marginBottom: 10,
+    },
+    headerInfo: {
+        borderRightWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        paddingRight: 7,
+        paddingLeft: 15,
     },
     txtHeaderInfo: {
         color: '#fff',
@@ -3338,6 +3326,12 @@ const styles = StyleSheet.create({
         fontFamily: 'Underdog',
         textAlign: 'center',
         marginBottom: 5,
+    },
+    txtHeaderInfo2: {
+        color: '#fff',
+        letterSpacing: 3,
+        fontFamily: 'Underdog',
+        textAlign: 'center',
     },
     infoSW: {
         flex: 1,

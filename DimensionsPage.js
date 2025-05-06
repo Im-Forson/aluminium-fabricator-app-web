@@ -10,7 +10,6 @@ import RequirePaymentModal from "./RequirePaymentModal";
 import AlufappToast from "./AlufappToast";
 import SavingCalculating from "./SavingCalculating";
 
-
 function DimensionsPage({ route }) {
     const title = route.params.title;
     const numOfWindows = route.params.numOfWindows;
@@ -26,14 +25,15 @@ function DimensionsPage({ route }) {
     const usage = alufappContext.sheetCalcUsage;
     const isToast = alufappContext.isToast;
     const isWhichToast = alufappContext.isWhichToast;
+    const isCalculating = alufappContext.isSheetCalculating;
     const windowsLimit = 7;
-
+    
     const navigation = useNavigation();
     const deviceDimension = Dimensions.get("window");
     const deviceWidth = deviceDimension.width;
     const deviceHeight = deviceDimension.height;
 
-    const [isCalculating, setCalculating] = useState(false);
+    const [isSheetCalculating, setSheetCalculating] = useState(false);
 
     let lowestSide;
     if (unit === "Millimeter" || unit === "Millimètre") {
@@ -64,7 +64,7 @@ function DimensionsPage({ route }) {
 
     const fetchResults = async (dim, size) => {
         try {
-            const res = await fetch('http://localhost:3001/sheet', {
+            const res = await fetch('https://alufapp-backend.onrender.com/sheet', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -74,7 +74,9 @@ function DimensionsPage({ route }) {
             
               const data = await res.json();
               return data;
+
         } catch (error) {
+            alufappContext.closeSheetCalculating();
             alufappContext.setWhichToast('sheet-fetch-results');
             alufappContext.showToast();
         }
@@ -131,12 +133,7 @@ function DimensionsPage({ route }) {
         }
 
         if (firstValidity === false) {
-            // setError(false);
-            // setValidityAlert2(false);
-            // setValidityAlert3(false);
-            // setValidityAlert1(true);
-            // setValidityAlert2B(false);
-            // alufappContext.showAlert();
+            alufappContext.closeSheetCalculating();
             window.alert('Invalid input: Please enter numbers only into the cells. Leave no space between numbers.');
             firstValidity = true;
             return;
@@ -195,14 +192,8 @@ function DimensionsPage({ route }) {
         }
 
         if (secondValidity === false) {
-            // setError(false)
-            // setValidityAlert1(false);
-            // setValidityAlert3(false);
-            // setValidityAlert2(false);
-            // setValidityAlert2B(true);
-            // glassSheetCtx.showAlert();
+            alufappContext.closeSheetCalculating();
             window.alert(`Number too low. Please enter a number equal to or above ${lowestSide}.`);
-            
             return;
         }
 
@@ -249,6 +240,7 @@ function DimensionsPage({ route }) {
 
         if (thirdValidity === false) {
             window.alert('Dimension exceeds sheet size. Please enter a value within the sheet dimensions.');
+            alufappContext.closeSheetCalculating();
             return;
         }
 
@@ -270,8 +262,8 @@ function DimensionsPage({ route }) {
         }
 
         if (qtyValidity === false) {
-           window.alert('Invalid input. Quantity cannot be Zero. Please enter a valid number in the quantity field.');
-            
+            alufappContext.closeSheetCalculating();
+            window.alert('Invalid input. Quantity cannot be Zero. Please enter a valid number in the quantity field.'); 
             return;
         }
         else { 
@@ -318,6 +310,7 @@ function DimensionsPage({ route }) {
 
             if (isLimited && totalQty > windowsLimit) {
                 if (previousWorkArea !== currentWorkArea) {
+                    alufappContext.closeSheetCalculating();
                     alufappContext.setOfflineModalVisible(true);
                     return;
                 }
@@ -326,6 +319,7 @@ function DimensionsPage({ route }) {
             }
 
             if (countID > 300) {
+                alufappContext.closeSheetCalculating();
                 window.alert('Unable to work more than 300 panels at a go. Please consider dividing your work.')
                 return;
             }
@@ -335,7 +329,8 @@ function DimensionsPage({ route }) {
             try {
                 // const results = SheetCalculator(DimensionList, SheetSize);
                 
-                // console.log('results: ', results)
+                // console.log('previousWorkArea: ', previousWorkArea)
+                // console.log('currentWorkArea: ', currentWorkArea)
                 
                 // COMPARE CURRENT WORK TO PREVIOUS WORK
                 if (!isLimited) {
@@ -371,13 +366,14 @@ function DimensionsPage({ route }) {
                                 }
                             );
         
-                            // glassSheetCtx.closeLoading();
-                            let newUsage = usage - 1;
-                            alufappContext.setUsage(newUsage);
-                            let newUsageStr = newUsage.toString();
-                            await AsyncStorage.setItem('@gwusage', newUsageStr);
-                            if (newUsage <= 0) {
-                                alufappContext.setSheetCalcLimited();
+                            if (totalQty > windowsLimit) {
+                                let newUsage = usage - 1;
+                                alufappContext.setUsage(newUsage);
+                                let newUsageStr = newUsage.toString();
+                                await AsyncStorage.setItem('@gwusage', newUsageStr);
+                                if (newUsage <= 0) {
+                                    alufappContext.setSheetCalcLimited();
+                                }
                             }
                         }
                     }
@@ -395,13 +391,14 @@ function DimensionsPage({ route }) {
                             }
                         );
     
-                        // alufappContext.closeLoading();
-                        let newUsage = usage - 1;
-                        alufappContext.setSheetCalcUsage(newUsage);
-                        let newUsageStr = newUsage.toString();
-                        await AsyncStorage.setItem('@gwusage', newUsageStr);
-                        if (newUsage <= 0) {
-                            alufappContext.setSheetCalcLimited();
+                        if (totalQty > windowsLimit) {
+                            let newUsage = usage - 1;
+                            alufappContext.setSheetCalcUsage(newUsage);
+                            let newUsageStr = newUsage.toString();
+                            await AsyncStorage.setItem('@gwusage', newUsageStr);
+                            if (newUsage <= 0) {
+                                alufappContext.setSheetCalcLimited();
+                            }
                         }
                     }
 
@@ -424,7 +421,8 @@ function DimensionsPage({ route }) {
                 }
                 
             } catch (error) {
-                window.alert(`${error}`)
+                // window.alert(`${error}`)
+                alufappContext.closeSheetCalculating();
                 return;
             }
         }
@@ -442,14 +440,8 @@ function DimensionsPage({ route }) {
             />
             <AlufappToast toastVisible={isToast && isWhichToast == 'sheet-dimensions-pay-success'} info='Transaction successful'/>
             <AlufappToast toastVisible={isToast && isWhichToast == 'sheet-calc-dimension-pay-cancel'} info='Transaction cancelled'/>
-            <AlufappToast toastVisible={isToast && isWhichToast == 'sheet-fetch-results'} info='Results failed! Check internet'/>
+            <AlufappToast toastVisible={isToast && isWhichToast == 'sheet-fetch-results'} info='Results fetch failed!' info2='Check your internet'/>
             <View style={styles.header}>
-                <Image style={{
-                    width: deviceWidth < 500 ? 70 : 100, 
-                    height: deviceWidth < 500 ? 70 : 100,
-                }}
-                source={require("./assets/images/icon.png")}
-                />
                 <Pressable style={styles.headerInfo}
                  onPress={() => {
                     const response = window.confirm('Navigate to main screen');
@@ -458,16 +450,13 @@ function DimensionsPage({ route }) {
                     }
                  }}
                 >
-                    {/* <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Aluminium</Text>
-                    <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Fabrication</Text>
-                    <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Apps</Text> */}
                     <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Sheet</Text>
-                    <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Worker</Text>
+                    <Text style={[styles.txtHeaderInfo2, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Worker</Text>
                 </Pressable>
                 <View style={styles.infoSW}>
                     <Text style={[
                         styles.txtSheetWorker,
-                        {fontSize: deviceWidth <= 500 ? 15 : 20}
+                        {fontSize: deviceWidth <= 500 ? 15 : 18}
                     ]}>Dimensions</Text>
                     <View style={{width: deviceWidth < 800 ? 0 : 200, height:0,}}></View>
                 </View>
@@ -477,15 +466,17 @@ function DimensionsPage({ route }) {
                     <View style={[
                         {
                             width: deviceWidth < 500 ? '100%' : ( deviceWidth < 800 ? '80%' : deviceWidth < 100 ? '60%' : '50%'),
-                            // paddingHorizontal: deviceWidth < 500 ? 15 : 5,
                             alignItems: 'center',
-                            // backgroundColor: 'blue',
                         }
                     ]}>
                         {/* WORK TITLE */}
                         <View style={styles.titleContainer}>
                             <View style={styles.titleInnerContainer}>
                                 <Text style={styles.title}>{title}</Text>
+                            </View>
+                            <View style={styles.sheetSizeCon}>
+                                <Text style={styles.txtSheetSize}>sheet size : </Text>
+                                <Text style={styles.txtSheetSizeVal}>{SheetSize.width} x {SheetSize.height} </Text>
                             </View>
                         </View>
                         <View style={styles.dimensionsHeader}>
@@ -502,13 +493,8 @@ function DimensionsPage({ route }) {
                                     pressed && {opacity: 0.5}
                                 ]}
                                     onPress={() => {
-                                        // fetchResults();
-                                        // setCalculating(true);
-
-                                        // setTimeout(() => {
-                                            CalculateButtonHandler()
-                                        //     setCalculating(false);
-                                        // }, 2000);
+                                        alufappContext.showSheetCalculating();
+                                        CalculateButtonHandler();
                                     }}
                                 >
                                     <Text style={styles.txtProceed}>Calculate</Text>
@@ -531,9 +517,16 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(236, 235, 228, 0.5)',
     },
     header: {
+        height: 65,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#383961',
+    },
+    headerInfo: {
+        borderRightWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        paddingRight: 7,
+        paddingLeft: 15,
     },
     txtHeaderInfo: {
         color: '#fff',
@@ -541,6 +534,12 @@ const styles = StyleSheet.create({
         fontFamily: 'Underdog',
         textAlign: 'center',
         marginBottom: 5,
+    },
+    txtHeaderInfo2: {
+        color: '#fff',
+        letterSpacing: 3,
+        fontFamily: 'Underdog',
+        textAlign: 'center',
     },
     infoSW: {
         flex: 1,
@@ -556,20 +555,39 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     titleContainer: {
-        height: 40,
+        // height: 40,
         width: '100%',
-        flexDirection: 'row',
         backgroundColor: 'rgba(208, 207, 207, 1)',
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 10
     },
+    sheetSizeCon: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        marginTop: 15,
+    },
+    txtSheetSize: {
+        letterSpacing: 2,
+        fontSize: 12,
+        color: 'green',
+        fontStyle: 'italic',
+        // marginRight: 10
+    },
+    txtSheetSizeVal: {
+        letterSpacing: 2,
+        fontSize: 10,
+        color: 'green',
+        fontStyle: 'italic',
+    },
     titleInnerContainer: {
         flexDirection: 'row',
     },
     title: {
-        fontSize: 18,
-        fontWeight: '500',
+        fontSize: 16,
+        fontWeight: '400',
         color: 'rgba(80, 0, 0, 1)',
         marginRight: 10,
         letterSpacing: 3

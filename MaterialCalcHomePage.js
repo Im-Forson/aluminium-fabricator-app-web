@@ -1,12 +1,9 @@
 import { View, Text, TextInput, StyleSheet, Image, Dimensions, ScrollView, Pressable } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { onValue, ref } from "firebase/database";
 
 import { AlufappContext } from "./alufapp-context";
-import { database } from "./firebaseConfig";
 import AlufappToast from "./AlufappToast";
 
 function MaterialCalcHomePage() {
@@ -40,22 +37,22 @@ function MaterialCalcHomePage() {
     const [isItalian, setItalian] = useState(true);
     const [isEco, setEco] = useState(false);
 
-    const fetchPriceData = async () => {
-        try {
-            const priceListRef = ref(database, 'price-list');
-            onValue(priceListRef, (snapshot) => {
-                alufappContext.setPriceList(snapshot.val());
-            });
+    // const fetchPriceData = async () => {
+    //     try {
+    //         const priceListRef = ref(database, 'price-list');
+    //         onValue(priceListRef, (snapshot) => {
+    //             alufappContext.setPriceList(snapshot.val());
+    //         });
             
-        } catch (error) {
-            alufappContext.showToast();
-            alufappContext.setWhichToast('home-price-toast')
-        }
-    }
+    //     } catch (error) {
+    //         alufappContext.showToast();
+    //         alufappContext.setWhichToast('home-price-toast')
+    //     }
+    // }
 
     const fetchPriceList = async () => {
         try {
-            const res = await fetch('http://localhost:3001/datalist', {
+            const res = await fetch('https://alufapp-backend.onrender.com/dataList', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -71,17 +68,6 @@ function MaterialCalcHomePage() {
             alufappContext.setWhichToast('home-price-toast');
         }
     }
-
-    const fetchdevInfo = async () => {
-            try {
-                const devInfoRef = ref(database, 'dev-info');
-                onValue(devInfoRef, (snapshot) => {
-                    setDevin(snapshot.val());
-                });
-            } catch (error) {
-                window.alert('DevInfo error!. Check internet');
-            }
-        }
 
     const setUsage = async () => {
         try {
@@ -129,9 +115,6 @@ function MaterialCalcHomePage() {
                 
                 if (workList.length > 0) {
                     alufappContext.setMatWorks(workList);
-                    setTimeout(() => {
-                        // ToastAndroid.show("Saved measurements loaded ", 3000);
-                    }, 4000);
                 }
             }
         } catch (e) {
@@ -143,7 +126,6 @@ function MaterialCalcHomePage() {
         setUsage();
         // fetchPriceData();
         fetchPriceList();
-        fetchdevInfo();
         loadWorksData();
     }, []);
 
@@ -153,6 +135,7 @@ function MaterialCalcHomePage() {
         setWorkTitle(trimmedTitle);
         
         if (trimmedTitle == devin.cred_add) {
+            setWorkTitle('');
             navigation.navigate('Developer', {page: 'mat-list'});
             return;
         }
@@ -224,12 +207,12 @@ function MaterialCalcHomePage() {
             <View style={styles.header}>
                 <AlufappToast toastVisible={isToast && isWhichToast == 'home-price-toast'} info='Failed to load current prices' />
                 <AlufappToast toastVisible={isToast && isWhichToast === 'dev-mat-usage-toast'} info='Usage added'/>
-                <Image style={{
+                {/* <Image style={{
                     width: deviceWidth < 500 ? 70 : 100, 
                     height: deviceWidth < 500 ? 70 : 100,
                 }}
                 source={require("./assets/images/icon.png")}
-                />
+                /> */}
                 <Pressable style={styles.headerInfo}
                  onPress={() => {navigation.navigate('Main')}}
                 >
@@ -237,7 +220,7 @@ function MaterialCalcHomePage() {
                     <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Fabrication</Text>
                     <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Apps</Text> */}
                     <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Materials</Text>
-                    <Text style={[styles.txtHeaderInfo, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Worker</Text>
+                    <Text style={[styles.txtHeaderInfo2, {fontSize: deviceWidth <= 500 ? 8 : 10}]}>Worker</Text>
                 </Pressable>
                 <View style={styles.infoSW}>
                     {/* <View style={{display: deviceWidth < 500 ? 'flex' : 'none'}}>
@@ -543,10 +526,17 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
+        height: 65,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#383961',
         marginBottom: 10,
+    },
+    headerInfo: {
+        borderRightWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        paddingRight: 7,
+        paddingLeft: 15,
     },
     txtHeaderInfo: {
         color: '#fff',
@@ -554,6 +544,12 @@ const styles = StyleSheet.create({
         fontFamily: 'Underdog',
         textAlign: 'center',
         marginBottom: 5,
+    },
+    txtHeaderInfo2: {
+        color: '#fff',
+        letterSpacing: 3,
+        fontFamily: 'Underdog',
+        textAlign: 'center',
     },
     infoSW: {
         flex: 1,
