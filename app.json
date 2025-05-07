@@ -22,7 +22,7 @@
       }
     },
     "web": {
-      "favicon": "./assets/alufab-icon.png"
+      "favicon": "./assets/alufab-web.png"
     },
     "plugins": [
       "expo-font"
