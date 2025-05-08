@@ -241,7 +241,9 @@ function MainPage() {
           </View>
         </View>
       </ScrollView>
-      
+      <View style={styles.developerCon}>
+        <Text style={styles.txtDeveloped}>Developed by Midev Infotech</Text>
+      </View>
     </View>
   );
 }
@@ -496,6 +498,18 @@ const styles = StyleSheet.create({
     letterSpacing: 3,
     fontWeight: '500',
   },
-  xxx: {},
+  developerCon: {
+    alignItems: 'center',
+    paddingTop: 30,
+    paddingBottom: 20,
+    
+    // backgroundColor: 'white'
+  },
+  txtDeveloped: {
+    fontStyle: 'italic',
+    fontSize: 12,
+    fontFamily: 'Underdog',
+    color: 'grey'
+  },
   xxx: {},
 });
